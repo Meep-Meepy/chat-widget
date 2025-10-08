@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Chat Input</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #f4f4f4;
+      margin: 0;
+    }
+
+    #chat-box {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      outline: none;
+    }
+
+    button {
+      padding: 10px 16px;
+      background-color: #059669;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      margin-left: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="chat-box">
+    <input type="text" id="userInput" placeholder="Type your message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <div id="status"></div>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const message = input.value.trim();
+      const status = document.getElementById("status");
+
+      if (!message) {
+        status.textContent = "Please type a message.";
+        return;
+      }
+
+      status.textContent = "Sending...";
+
+      try {
+        const res = await fetch("https://cxk.app.n8n.cloud/webhook/54a06a7f-fa96-4ad2-86ae-41172400426b/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: message,
+            route: "general"
+          })
+        });
+
+        if (res.ok) {
+          status.textContent = "Message sent!";
+          input.value = "";
+        } else {
+          status.textContent = "Failed to send message.";
+        }
+      } catch (err) {
+        console.error(err);
+        status.textContent = "Error sending message.";
+      }
+    }
+  </script>
+
+</body>
+</html>
