@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chat Widget</title>
+  <script>
+    window.ChatWidgetConfig = {
+      webhook: {
+        url: "https://cxk.app.n8n.cloud/webhook/54a06a7f-fa96-4ad2-86ae-41172400426b/chat",
+        route: 'general'
+      },
+      branding: {
+        name: "Meep AI",
+        welcometext: "Ask me anything :D",
+        responseTimeText: "Click the button below to start chatting"
+      },
+      style: {
+        primaryColour: '#010981',
+        secondaryColour: '#059669',
+        position: 'right',
+        backgroundColour: '#ffffff',
+        frontColour: '#1e2937'
+      },
+      suggestions: ['What are your hours?', 'Can I speak to support?', 'Tell me a joke']
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/gh/funtastic418/chat-widget@main/chat-widget.js" defer></script>
+</head>
+<body></body>
+</html>
