@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Chat with Meep AI</title>
+  <title>Rounded Chat UI</title>
   <style>
     body {
-      font-family: sans-serif;
-      background: #f4f4f4;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -15,12 +15,11 @@
     }
 
     .chat-container {
-      background: white;
-      width: 90%;
-      max-width: 500px;
-      height: 80vh;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      background: #fff;
+      width: 400px;
+      height: 600px;
+      border-radius: 25px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -28,44 +27,81 @@
 
     #chat-log {
       flex: 1;
-      padding: 15px;
+      padding: 20px;
       overflow-y: auto;
-      background: #fafafa;
+      scrollbar-width: thin;
+      scrollbar-color: #ccc transparent;
+    }
+
+    /* Chrome, Edge, Safari scrollbar */
+    #chat-log::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #chat-log::-webkit-scrollbar-thumb {
+      background-color: #ccc;
+      border-radius: 3px;
     }
 
     .message {
-      margin-bottom: 12px;
+      margin-bottom: 15px;
+      max-width: 75%;
+      padding: 12px 18px;
+      border-radius: 20px;
+      word-wrap: break-word;
+      line-height: 1.4;
+      font-size: 15px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
     .user {
-      text-align: right;
-      color: #010981;
+      background-color: #0a33a3;
+      color: white;
+      margin-left: auto;
+      border-bottom-right-radius: 5px;
     }
 
     .bot {
-      text-align: left;
-      color: #059669;
+      background-color: #10b981;
+      color: white;
+      margin-right: auto;
+      border-bottom-left-radius: 5px;
     }
 
     .input-area {
       display: flex;
-      border-top: 1px solid #ddd;
+      padding: 15px 20px;
+      background: #f0f2f5;
+      border-radius: 0 0 25px 25px;
+      box-shadow: 0 -4px 6px rgba(0,0,0,0.05);
     }
 
     input[type="text"] {
       flex: 1;
-      padding: 12px;
       border: none;
+      border-radius: 25px;
+      padding: 12px 20px;
       font-size: 16px;
+      outline: none;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);
     }
 
     button {
-      padding: 12px 16px;
-      background-color: #059669;
-      color: white;
+      margin-left: 15px;
+      padding: 12px 24px;
       border: none;
+      background-color: #10b981;
+      color: white;
+      font-weight: 600;
+      border-radius: 25px;
       cursor: pointer;
-      font-size: 16px;
+      transition: background-color 0.25s ease;
+      box-shadow: 0 2px 8px rgba(16,185,129,0.4);
+    }
+
+    button:hover {
+      background-color: #0f9a6e;
+      box-shadow: 0 3px 10px rgba(15,154,110,0.6);
     }
   </style>
 </head>
@@ -73,7 +109,7 @@
   <div class="chat-container">
     <div id="chat-log"></div>
     <div class="input-area">
-      <input type="text" id="userInput" placeholder="Type a message..." />
+      <input type="text" id="userInput" placeholder="Type your message..." autocomplete="off" />
       <button onclick="sendMessage()">Send</button>
     </div>
   </div>
@@ -86,4 +122,47 @@
       const messageEl = document.createElement("div");
       messageEl.className = `message ${sender}`;
       messageEl.textContent = text;
+      chatLog.appendChild(messageEl);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const message = inputField.value.trim();
+      if (!message) return;
+
+      appendMessage("user", message);
+      inputField.value = "";
+
+      try {
+        const response = await fetch("https://cxk.app.n8n.cloud/webhook/54a06a7f-fa96-4ad2-86ae-41172400426b/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: message,
+            route: "general"
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.output) {
+          appendMessage("bot", data.output);
+        } else {
+          appendMessage("bot", "🤖 Sorry, I didn't understand that.");
+        }
+
+      } catch (error) {
+        console.error("Error:", error);
+        appendMessage("bot", "⚠️ Something went wrong. Try again later.");
+      }
+    }
+
+    inputField.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>
 
