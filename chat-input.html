@@ -1,56 +1,115 @@
-<!-- Widget Configuration -->
-<script>
-    window.ChatWidgetConfig = {
-        webhook: {
-            url: "https://cxk1.app.n8n.cloud/webhook/54a06a7f-fa96-4ad2-86ae-41172400426b/chat", // Make sure to replace this with your actual webhook URL
-            route: 'general'
-        },
-        branding: {
-            logo: 'https://yourwebsite.com/path-to-your-logo.png', // Replace with a real image URL
-            name: 'Meep AI',
-            welcometext: 'Ask me anything :D',
-            responseTimeText: 'Click the button below to start chatting'
-        },
-        style: {
-            primaryColour: '#010981', // Fixed 
-            secondaryColour: '#059669',
-            position: 'right',
-            backgroundColour: '#ffffff', // Fixed invalid hex
-            frontColour: '#1e2937' // Fixed invalid hex
-        },
-        // Add suggestions that users can click (optional)
-        suggestions: ['What are your hours?', 'Can I speak to support?', 'Tell me a joke']
-    };
-</script>
-
-<!-- Fix: Corrected typo from 'scr' to 'src' -->
-<script src="https://cdn.jsdelivr.net/gh/funtastic418/chat-widget@main/chat-widget.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const checkExist = setInterval(() => {
-            const chatContainer = document.querySelector(".chat-container");
-            const chatButton = document.querySelector(".chat-button");
-
-            if (chatContainer && chatButton) {
-                clearInterval(checkExist);
-
-                chatButton.addEventListener("click", () => {
-                    chatContainer.classList.toggle("fullscreen-chat");
-                });
-            }
-        }, 300);
-    });
-</script>
-
-<style>
-    .fullscreen-chat {
-        position: fixed !important;
-        top: 0;
-        left: 0;
-        width: 100vw !important;
-        height: 100vh !important;
-        z-index: 9999 !important;
-        border-radius: 0 !important;
-        max-height: none !important;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chat Widget</title>
+  <style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        height: 100%;
     }
-</style>
+
+    .chat-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 300px;
+        height: 420px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        font-family: sans-serif;
+    }
+
+    .chat-header {
+        background-color: #4a6478;
+        color: white;
+        padding: 12px;
+        font-weight: bold;
+        font-size: 16px;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    .chat-body {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        background-color: #f5f5f5;
+    }
+
+    .chat-input {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #ccc;
+    }
+
+    .chat-input input {
+        flex: 1;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    .chat-input button {
+        margin-left: 8px;
+        background-color: #4a6478;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">Meep AI</div>
+    <div class="chat-body" id="chat-body"></div>
+    <div class="chat-input">
+      <input type="text" id="chat-input" placeholder="Type a message..." />
+      <button id="send-btn">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById("chat-input");
+    const button = document.getElementById("send-btn");
+    const body = document.getElementById("chat-body");
+
+    button.addEventListener("click", () => {
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      const userMsg = document.createElement("div");
+      userMsg.textContent = "You: " + msg;
+      body.appendChild(userMsg);
+
+      fetch("https://cxk1.app.n8n.cloud/webhook/54a06a7f-fa96-4ad2-86ae-41172400426b/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": "your-secret-token" // Optional security if you've set this up
+        },
+        body: JSON.stringify({ message: msg })
+      })
+      .then(res => res.json())
+      .then(data => {
+        const botMsg = document.createElement("div");
+        botMsg.textContent = "Meep AI: " + (data.reply || "No reply");
+        body.appendChild(botMsg);
+        body.scrollTop = body.scrollHeight;
+      });
+
+      input.value = "";
+    });
+  </script>
+</body>
+</html>
+
